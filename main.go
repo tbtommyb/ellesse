@@ -72,7 +72,7 @@ func init() {
 		log.Fatal(err)
 	}
 	modeWidth = 12
-	sizeWidth = 8
+	sizeWidth = 10
 	nameWidth = termWidth - modeWidth - sizeWidth - 2 // -2 to allow for spaces
 }
 
