@@ -17,13 +17,12 @@ type fileInfo struct {
   colors *colorConfig
 }
 
-func (e *fileInfo) print() (error) {
+func (e *fileInfo) print() {
   name := e.file.Name()
   if e.file.IsDir() {
     name = e.colors.dir(name)
   }
   fmt.Printf("%-12s %10d %-20s\n", e.file.Mode(), e.file.Size(), name)
-  return nil
 }
 
 func printHeader() (error) {
@@ -39,6 +38,7 @@ func main() {
   } else {
     dirname = os.Args[1]
   }
+
   colorConf := &colorConfig{
     dir: color.New(color.FgYellow).SprintFunc(),
   }
