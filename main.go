@@ -25,7 +25,7 @@ func (e *fileInfo) print() {
 		if e.file.IsDir() {
 			name = e.colors.dir(name)
 		}
-		if e.file.Mode()&os.ModeSymLink != 0 {
+		if e.file.Mode()&os.ModeSymlink != 0 {
 			name = e.colors.symlink(name)
 		}
 	}
