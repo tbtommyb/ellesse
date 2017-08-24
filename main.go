@@ -5,10 +5,24 @@ import (
   "fmt"
   "log"
   "os"
+  "github.com/fatih/color"
 )
 
-func printEntry(entry os.FileInfo) (error) {
-  fmt.Printf("%-12s %10d %-20s\n", entry.Mode(), entry.Size(), entry.Name())
+type colorConfig struct {
+  dir (func(a ...interface{}) string)
+}
+
+type fileInfo struct {
+  file os.FileInfo
+  config *colorConfig
+}
+
+func (e *fileInfo) print() (error) {
+  name := e.file.Name()
+  if e.file.IsDir() {
+    name = e.config.dir(name)
+  }
+  fmt.Printf("%-12s %10d %-20s\n", e.file.Mode(), e.file.Size(), name)
   return nil
 }
 
@@ -25,6 +39,9 @@ func main() {
   } else {
     dirname = os.Args[1]
   }
+  conf := &colorConfig{
+    dir: color.New(color.FgYellow).SprintFunc(),
+  }
 
   entries, err := ioutil.ReadDir(dirname)
   if err != nil {
@@ -32,6 +49,10 @@ func main() {
   }
   printHeader()
   for _, entry := range entries {
-    printEntry(entry)
+    file := &fileInfo{
+      file: entry,
+      config: conf,
+    }
+    file.print()
   }
 }
