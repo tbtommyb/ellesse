@@ -14,13 +14,13 @@ type colorConfig struct {
 
 type fileInfo struct {
   file os.FileInfo
-  config *colorConfig
+  colors *colorConfig
 }
 
 func (e *fileInfo) print() (error) {
   name := e.file.Name()
   if e.file.IsDir() {
-    name = e.config.dir(name)
+    name = e.colors.dir(name)
   }
   fmt.Printf("%-12s %10d %-20s\n", e.file.Mode(), e.file.Size(), name)
   return nil
@@ -39,7 +39,7 @@ func main() {
   } else {
     dirname = os.Args[1]
   }
-  conf := &colorConfig{
+  colorConf := &colorConfig{
     dir: color.New(color.FgYellow).SprintFunc(),
   }
 
@@ -51,7 +51,7 @@ func main() {
   for _, entry := range entries {
     file := &fileInfo{
       file: entry,
-      config: conf,
+      colors: colorConf,
     }
     file.print()
   }
