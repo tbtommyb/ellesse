@@ -6,10 +6,12 @@ import (
   "log"
   "os"
   "github.com/fatih/color"
+  "flag"
 )
 
 type colorConfig struct {
   dir (func(a ...interface{}) string)
+  symlink (func(a ...interface{}) string)
 }
 
 type fileInfo struct {
@@ -19,26 +21,37 @@ type fileInfo struct {
 
 func (e *fileInfo) print() {
   name := e.file.Name()
-  if e.file.IsDir() {
-    name = e.colors.dir(name)
+  if showColors {
+    if e.file.IsDir() {
+      name = e.colors.dir(name)
+    }
   }
   fmt.Printf("%-12s %10d %-20s\n", e.file.Mode(), e.file.Size(), name)
 }
+
+var (
+  showColors bool
+  dirname string
+)
 
 func printHeader() (error) {
   fmt.Printf("%-12s %10s %-20s\n", "Mode", "Size", "Name")
   return nil
 }
 
-func main() {
-  var dirname string
+func init() {
+  flag.BoolVar(&showColors, "colors", false, "Toggle colours in output")
+  flag.Parse()
 
-  if len(os.Args) == 1 {
-    dirname = "."
+  dirProvided := flag.NArg() > 0
+  if dirProvided {
+    dirname = flag.Arg(0)
   } else {
-    dirname = os.Args[1]
+    dirname = "."
   }
+}
 
+func main() {
   colorConf := &colorConfig{
     dir: color.New(color.FgYellow).SprintFunc(),
   }
