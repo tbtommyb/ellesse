@@ -37,6 +37,10 @@ func truncate(s string, n int) string {
 	return s
 }
 
+func outputLine(vals ...interface{}) {
+	fmt.Printf("%-[1]*[2]v %[3]*[4]v %-[5]*[6]v\n", modeWidth, vals[0], sizeWidth, vals[1], nameWidth, vals[2])
+}
+
 func (e *fileInfo) print() {
 	name := truncate(e.file.Name(), nameWidth)
 	if showColors {
@@ -47,12 +51,11 @@ func (e *fileInfo) print() {
 			name = e.colors.symlink(name)
 		}
 	}
-	fmt.Printf("%-[1]*[2]s %[3]*[4]d %-[5]*[6]s\n", modeWidth, e.file.Mode(), sizeWidth, e.file.Size(), nameWidth, name)
+	outputLine(e.file.Mode(), e.file.Size(), name)
 }
 
-func printHeader() error {
-	fmt.Printf("%-[1]*[2]s %[3]*[4]s %-[5]*[6]s\n", modeWidth, "Mode", sizeWidth, "Size", nameWidth, "Name")
-	return nil
+func printHeader() {
+	outputLine("Mode", "Size", "Name")
 }
 
 func init() {
