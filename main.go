@@ -10,6 +10,13 @@ import (
 	"os"
 )
 
+type colorSprintFunc func(a ...interface{}) string
+
+type colorHolder struct {
+	dir     colorSprintFunc
+	symlink colorSprintFunc
+}
+
 var (
 	showColors bool
 	dirname    string
@@ -17,6 +24,7 @@ var (
 	modeWidth  int = 12
 	sizeWidth  int = 10
 	nameWidth  int
+	colors     colorHolder
 )
 
 func init() {
@@ -34,13 +42,9 @@ func init() {
 		log.Fatal(err)
 	}
 	nameWidth = termWidth - modeWidth - sizeWidth - 2 // -2 to allow for spaces
-}
 
-type colorSprintFunc func(a ...interface{}) string
-
-type colorHolder struct {
-	dir     colorSprintFunc
-	symlink colorSprintFunc
+	colors.dir = color.New(color.FgYellow).SprintFunc()
+	colors.symlink = color.New(color.FgRed).SprintFunc()
 }
 
 func truncate(s string, n int) string {
@@ -55,7 +59,7 @@ func outputLine(val1, val2, val3 interface{}) {
 	fmt.Printf("%-[1]*[2]v %[3]*[4]v %-[5]*[6]v\n", modeWidth, val1, sizeWidth, val2, nameWidth, val3)
 }
 
-func printEntry(f os.FileInfo, c *colorHolder) {
+func printEntry(f os.FileInfo, c colorHolder) {
 	name := truncate(f.Name(), nameWidth)
 	if showColors {
 		if f.IsDir() {
@@ -73,11 +77,6 @@ func printHeader() {
 }
 
 func main() {
-	colors := &colorHolder{
-		dir:     color.New(color.FgYellow).SprintFunc(),
-		symlink: color.New(color.FgRed).SprintFunc(),
-	}
-
 	entries, err := ioutil.ReadDir(dirname)
 	if err != nil {
 		log.Fatal(err)
