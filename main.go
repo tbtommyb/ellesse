@@ -19,14 +19,11 @@ var (
 	nameWidth  int
 )
 
-type colorConfig struct {
-	dir     (func(a ...interface{}) string)
-	symlink (func(a ...interface{}) string)
-}
+type colorSprintFunc func(a ...interface{}) string
 
-type fileInfo struct {
-	file   os.FileInfo
-	colors *colorConfig
+type colorConfig struct {
+	dir     colorSprintFunc
+	symlink colorSprintFunc
 }
 
 func truncate(s string, n int) string {
@@ -37,36 +34,36 @@ func truncate(s string, n int) string {
 	return s
 }
 
-func outputLine(vals ...interface{}) {
-	fmt.Printf("%-[1]*[2]v %[3]*[4]v %-[5]*[6]v\n", modeWidth, vals[0], sizeWidth, vals[1], nameWidth, vals[2])
+// interface{} is used to allow values of different types to be outputted
+func outputLine(val1, val2, val3 interface{}) {
+	fmt.Printf("%-[1]*[2]v %[3]*[4]v %-[5]*[6]v\n", modeWidth, val1, sizeWidth, val2, nameWidth, val3)
 }
 
-func (e *fileInfo) print() {
-	name := truncate(e.file.Name(), nameWidth)
+func printEntry(f os.FileInfo, c *colorConfig) {
+	name := truncate(f.Name(), nameWidth)
 	if showColors {
-		if e.file.IsDir() {
-			name = e.colors.dir(name)
+		if f.IsDir() {
+			name = c.dir(name)
 		}
-		if e.file.Mode()&os.ModeSymlink != 0 {
-			name = e.colors.symlink(name)
+		if f.Mode()&os.ModeSymlink != 0 {
+			name = c.symlink(name)
 		}
 	}
-	outputLine(e.file.Mode(), e.file.Size(), name)
+	outputLine(f.Mode(), f.Size(), name)
 }
 
 func printHeader() {
 	outputLine("Mode", "Size", "Name")
 }
 
+// TODO: Move to be with var declaration
 func init() {
 	var err error
 	flag.BoolVar(&showColors, "colors", false, "Toggle colours in output")
 	flag.Parse()
 
-	dirProvided := flag.NArg() > 0
-	if dirProvided {
-		dirname = flag.Arg(0)
-	} else {
+	dirname = flag.Arg(0)
+	if dirname == "" {
 		dirname = "."
 	}
 
@@ -74,6 +71,7 @@ func init() {
 	if err != nil {
 		log.Fatal(err)
 	}
+	// TODO: Set constants in the var
 	modeWidth = 12
 	sizeWidth = 10
 	nameWidth = termWidth - modeWidth - sizeWidth - 2 // -2 to allow for spaces
@@ -91,10 +89,6 @@ func main() {
 	}
 	printHeader()
 	for _, entry := range entries {
-		file := &fileInfo{
-			file:   entry,
-			colors: colorConf,
-		}
-		file.print()
+		printEntry(entry, colorConf)
 	}
 }
