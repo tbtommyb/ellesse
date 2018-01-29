@@ -14,7 +14,7 @@ int main(int argc, char* argv[])
     try {
         auto results = Ellesse{p};
         for(auto& r : results.list()) {
-            std::cout << r.filename().string() << std::endl;
+            std::cout << r.filename().string() << " " << fs::file_size(r) << std::endl;
         }
         return 0;
     } catch(const std::invalid_argument& ia) {
