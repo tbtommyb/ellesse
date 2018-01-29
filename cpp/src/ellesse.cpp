@@ -3,13 +3,20 @@
 
 namespace fs = boost::filesystem;
 
-std::vector<fs::path> Ellesse::list(std::string path)
+Ellesse::Ellesse(fs::path p)
+{
+    fs::file_status s = fs::status(p);
+    if(!fs::is_directory(s)) {
+        throw std::invalid_argument{p.string()};
+    }
+    this->query = p;
+};
+
+std::vector<fs::path> Ellesse::list()
 {
     std::vector<fs::path> results;
-    for(auto i = fs::directory_iterator(path); i != fs::directory_iterator{}; i++) {
-        if(!fs::is_directory(i->path())) {
-            results.push_back(i->path());
-        }
+    for(auto i = fs::directory_iterator(this->query); i != fs::directory_iterator{}; i++) {
+        results.push_back(i->path());
     }
     return results;
-}
+};

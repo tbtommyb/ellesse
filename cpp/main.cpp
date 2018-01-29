@@ -4,14 +4,24 @@
 
 int main(int argc, char* argv[])
 {
-    std::string p{};
+    fs::path p{};
     if(argc !=2 ) {
-        p = ".";
+        p = fs::current_path();
     } else {
-        p = argv[1];
+        p = fs::path{argv[1]};
     }
-    auto results{Ellesse::list(p)};
-    for (auto& r : results) {
-        std::cout << r.filename().string() << std::endl;
+
+    try {
+        auto results = Ellesse{p};
+        for(auto& r : results.list()) {
+            std::cout << r.filename().string() << std::endl;
+        }
+        return 0;
+    } catch(const std::invalid_argument& ia) {
+        std::cerr << ia.what() << " is not a valid directory" << std::endl;
+        return 1;
+    } catch(const fs::filesystem_error& e) {
+        std::cerr << e.what() << " is not a valid directory" << std::endl;
+        return 1;
     }
 }
