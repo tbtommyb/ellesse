@@ -1,3 +1,6 @@
+#ifndef __ellesse__
+#define __ellesse__
+
 #include <boost/filesystem.hpp>
 #include <string>
 
@@ -9,3 +12,5 @@ public:
     ~Ellesse() = default;
     static std::vector<fs::path> list(std::string path);
 };
+
+#endif
