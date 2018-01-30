@@ -1,5 +1,7 @@
 #include <string>
 #include <iostream>
+#include <iomanip>
+#include <boost/format.hpp>
 #include "src/ellesse.hpp"
 
 int main(int argc, char* argv[])
@@ -14,7 +16,7 @@ int main(int argc, char* argv[])
     try {
         auto results = Ellesse{p};
         for(auto& r : results.list()) {
-            std::cout << r.filename().string() << " " << fs::file_size(r) << std::endl;
+            std::cout << boost::format("%3% %1% %|60t|%2%\n") % r.path % r.size % r.mode;
         }
         return 0;
     } catch(const std::invalid_argument& ia) {

@@ -1,5 +1,5 @@
-#include "ellesse.hpp"
 #include <string>
+#include "ellesse.hpp"
 
 namespace fs = boost::filesystem;
 
@@ -12,11 +12,19 @@ Ellesse::Ellesse(fs::path p)
     this->query = p;
 };
 
-std::vector<fs::path> Ellesse::list()
+std::vector<File> Ellesse::list()
 {
-    std::vector<fs::path> results;
+    std::vector<File> results;
     for(auto i = fs::directory_iterator(this->query); i != fs::directory_iterator{}; i++) {
-        results.push_back(i->path());
+        fs::path p = i->path();
+        unsigned long size;
+        if(fs::is_directory(p)) {
+            size = 0;
+        } else {
+            size = fs::file_size(p);
+        }
+        File f = { p.string(), size, "rwx" };
+        results.push_back(f);
     }
     return results;
 };
