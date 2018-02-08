@@ -2,7 +2,7 @@
 #include <iostream>
 #include <iomanip>
 #include <boost/format.hpp>
-#include "src/ellesse.hpp"
+#include "ellesse.hpp"
 
 int main(int argc, char* argv[])
 {
@@ -14,9 +14,13 @@ int main(int argc, char* argv[])
     }
 
     try {
-        auto results = Ellesse{p};
-        for(auto& r : results.list()) {
-            std::cout << boost::format("%3% %1% %|60t|%2%\n") % r.path % r.size % r.mode;
+        auto dir = Ellesse::Ellesse{p};
+        for(const auto& f : dir.items()) {
+            std::cout << boost::format("%1$o %2$-20s %3$1s %4$d\n")
+                % f.mode
+                % f.pathName
+                % (f.isDirectory ? "D" : "")
+                % f.size;
         }
         return 0;
     } catch(const std::invalid_argument& ia) {
