@@ -24,14 +24,20 @@ find_package(Qt5Gui)
 # add the qml.qrc file
 qt5_add_resources(qml_QRC qml.qrc)
 
+find_package(Boost COMPONENTS system filesystem REQUIRED)
+
 # add source files
 set(SOURCE
 	${SOURCE}
 	main.cpp
+  src/ellesse_viewer.cpp
 )
 
-# Tell CMake to create the helloworld executable
+# Tell CMake to create the executable
 add_executable(ellesse-qt ${SOURCE} ${qml_QRC})
 
+target_include_directories(ellesse-qt PUBLIC include)
+
 # Use the Qml/Quick modules from Qt 5.
-target_link_libraries(ellesse-qt Qt5::Qml Qt5::Quick)
+target_link_libraries(ellesse-qt Qt5::Qml Qt5::Quick ${Boost_LIBRARIES} Ellesse)
+

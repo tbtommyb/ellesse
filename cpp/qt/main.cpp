@@ -1,5 +1,8 @@
 #include <QGuiApplication>
+#include <QQmlContext>
 #include <qqmlapplicationengine>
+#include <iostream>
+#include "ellesse_viewer.hpp"
 
 int main(int argc, char *argv[])
 {
@@ -7,8 +10,13 @@ int main(int argc, char *argv[])
 
     QCoreApplication::addLibraryPath("./");
 
-    QQmlApplicationEngine engine;
-    engine.load(QUrl(QStringLiteral("qrc:/main.qml")));
+    EllesseViewer viewer{};
 
+    QQmlApplicationEngine engine;
+
+    QQmlContext *context = engine.rootContext();
+    context->setContextProperty("_Ellesse", &viewer);
+
+    engine.load(QUrl(QStringLiteral("qrc:/main.qml")));
     return app.exec();
 }
